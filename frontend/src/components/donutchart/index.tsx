@@ -1,26 +1,50 @@
-//sintaxe lambda
-
 import React from 'react';
+import axios from 'axios';
 import Chart from 'react-apexcharts'
+import { BASE_URL } from 'utils/requests';
+import { SaleSum } from 'types/salesum';
 // PROCURAR NA PÁGINA DO APEX CHARTS ! https://apexcharts.com
+
+
+
+type ChartData = {
+  series: number[];
+  labels: string[];
+}
+
+
 const DonutChart = () => {
+  //usar react hooks
+  let chartData: ChartData = { labels: [], series: [] };
 
-  const mockData = {
-    series: [477138, 499928, 444867, 220426, 473088],
-    labels: ['Anakin', 'Barry Allen', 'Kal-El', 'Logan', 'Padmé']
-}
+  axios.get(`${BASE_URL}/sales/amount-by-seller`)
+    //asyncFunction
+    .then(response => {
+      console.log(response.data);
+      const data = response.data as SaleSum[];
+      const myLabels = data.map(x => x.sellerName);
+      const mySeries = data.map(x => x.sum);
 
-const options = {
+      chartData = { labels: myLabels, series: mySeries };
+
+      console.log(chartData);
+    });
+  // const mockData = {
+  //  series: [477138, 499928, 444867, 220426, 473088],
+  //  labels: ['Anakin', 'Barry Allen', 'Kal-El', 'Logan', 'Padmé']
+  //}
+
+  const options = {
     legend: {
-        show: true
+      show: true
     }
-}
- 
+  }
+
 
   return (
     <Chart
-      options={{ ...options, labels: mockData.labels }}
-      series={mockData.series}
+      options={{ ...options, labels: chartData.labels }}
+      series={chartData.series}
       type="donut"
       height="240"
     />
