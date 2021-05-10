@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Chart from 'react-apexcharts'
-import { BASE_URL } from 'utils/requests';
+import { AMOUNT, BASE_URL } from 'utils/requests';
 import { SaleSum } from 'types/salesum';
 // PROCURAR NA PÁGINA DO APEX CHARTS ! https://apexcharts.com
 
@@ -14,21 +14,21 @@ type ChartData = {
 
 
 const DonutChart = () => {
-  //usar react hooks
-  let chartData: ChartData = { labels: [], series: [] };
 
-  axios.get(`${BASE_URL}/sales/amount-by-seller`)
-    //asyncFunction
-    .then(response => {
-      console.log(response.data);
-      const data = response.data as SaleSum[];
-      const myLabels = data.map(x => x.sellerName);
-      const mySeries = data.map(x => x.sum);
+  const [chartData, setChartData] = useState<ChartData>({ labels: [], series: [] });
+  
+  useEffect(() => {
+    axios.get(`${BASE_URL}${AMOUNT}`)
+      .then(response => {
+        const data = response.data as SaleSum[];
+        const myLabels = data.map(x => x.sellerName);
+        const mySeries = data.map(x => x.sum);
 
-      chartData = { labels: myLabels, series: mySeries };
+        setChartData({ labels: myLabels, series: mySeries });
+      });
 
-      console.log(chartData);
-    });
+  } , []);
+
   // const mockData = {
   //  series: [477138, 499928, 444867, 220426, 473088],
   //  labels: ['Anakin', 'Barry Allen', 'Kal-El', 'Logan', 'Padmé']
